@@ -60,21 +60,9 @@
    **/
 	$.fn.ft_filelist = function(options) {
     return this.each(function() {
-      // Make background color on table rows show up nicely on hover
-  		$(this).find("tr").hover(
-        function(){$(this).toggleClass('rowhover');},
-        function(){$(this).toggleClass('rowhover')}
-  		);
-      // Hover on the diamond.
-      $(this).find("td.details span.show").hover(
-        function(){$(this).toggleClass('hover')}, 
-        function(){$(this).toggleClass('hover')}
-      );
+
       // Hide file details on second diamond click.
-  		$(this).find("td.details span.hide").hover(
-  		  function(){$(this).toggleClass('hover')}, 
-  		  function(){$(this).toggleClass('hover')}
-  		).click(function(){
+  		$(this).find("td.details span.hide").click(function(){
   			$(this).parent().parent().next().remove();
   			$(this).hide();
   			$(this).prev().show();

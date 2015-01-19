@@ -1,3 +1,6 @@
+* {
+    box-sizing: border-box;
+}
 .safarihide {
 	position:absolute;
 	left:-10000px;
@@ -12,24 +15,12 @@ body, h1, h2, .navigation, #sidebar form #sidebar #files_list, #filelist .filede
 	margin:0;
 	padding:0;
 }
-#filelist .details span.hide {
-	background:#ffc;
-	color:#000;  
-}
-#filelist tr.rowhover, a:hover, h1, #sidebar h2, #filelist th, #filelist tfoot td, #filelist .hover, #filelist tr.rowhover .details span.hide {
-	background:#326532 !important;
-	color:#fff !important;
-}
+
 .error {color:red;}
 .ok {color:#326532;}
 .hidden {display:none;}
-a {
-	color:#326532;
-	text-decoration:none;
-}
-a:hover {
-	text-decoration:underline;
-}
+a { text-decoration:none;}
+a:hover {text-decoration:none;}
 #logout {
 	position:absolute;
 	top:4px;
@@ -43,7 +34,7 @@ a:hover {
   margin:0;
 }
 h1 a, #logout a {
-	color:#fff;
+	color:black;
 }
 h1 {
 	font-size:2em;
@@ -56,6 +47,17 @@ h2 {
 	font-weight:normal;
 	margin-left:265px;
 }
+
+#main {
+    display: block;
+    height: 100%;
+    }
+    #header {
+        height: 35px;
+        font-size: 10px;
+        background: white;
+        padding: 0 20px;
+    }
 #main h2,
 #main p {
   margin-left:25px;
@@ -64,112 +66,8 @@ form .description {
   font-size:0.8em;
   margin:0;
 }
-/* Normal tables */
-table {
-  border:1px solid black;
-  border-collapse:collapse;
-  margin:0 25px 15px 25px;
-  text-align:left;
-  width:300px;
-}
-th {
-  font-weight:bold;
-  background:#326532;
-  color:#fff;
-}
-th, td {
-  border:1px solid black;
-  padding:5px 10px;
-}
 
-/* Sidebar */
-#sidebar {
-	width:225px;
-	margin:0 40px 0 25px;
-	float:left;
-	font-size:10px;
-}
-#sidebar .section {
-	background:#DAE3DA;
-	margin:0 0 2.5em 0;
-	padding-bottom:0.8em;
-	border:1px solid black;
-}
-#sidebar .section form {
-	padding:0.8em 0.8em 0 0.8em;
-}
-#sidebar h2 {
-	font-size:1.2em;
-	font-weight:bold;
-	padding:0.4em 0 0.4em 0.4em;
-	margin:0;
-	border-bottom:1px solid black;
-}
-#sidebar h3 {
-	font-weight:bold;
-	font-size:1.2em;
-	margin:1em 0 0.5em 0;
-}
-#sidebar ul {
-	margin:0.8em 0 0 1.5em;
-	padding:0;	
-}
-#sidebar #files_list, #sidebar #searchlist {
-	margin-left:1.5em;
-}
-#sidebar #uploadbutton {
-	margin:1em 0 0 0;
-}
-#sidebar .info {
-  float:right;
-}
-#files_list span.error {
-	cursor:pointer;
-}
-#files_list span.error:hover {
-	text-decoration:underline;
-}
-#uploadsection input {
-	width:200px;
-}
-#mkdir, #q {
-	width:140px;
-}
-#mkdirsubmit, #searchsubmit {
-	width:40px;
-}
-#q {
-	width:130px;
-}
-#searchsubmit {
-	width:50px;
-}
-#sidebar p {
-	text-align:center;
-}
-.label_highlight {
-  font-weight:bold;
-}
-/* Search */
-div#searchoptions {
-	margin:0.5em 0 0 0.3em;
-}
-dl#searchlist dt {
-	font-size:1.2em;;
-}
-dl#searchlist dt.dir {
-	font-weight:bold;
-}
-dl#searchlist dd {
-	margin:0.3em 0 0.5em 1em;
-	padding-left:0;
-}
-dl#searchlist dd a {
-	color:#666;
-}
-dl#searchlist dd a:hover {
-	color:#fff;
-}
+
 /* Status box and auto update box */
 #status p, #autoupdate p {
   text-align:left;
@@ -185,140 +83,192 @@ dl#searchlist dd a:hover {
 	padding:0 0 0 10px;  
 }
 #status, #autoupdate {
-	background-color:#ffc;
-	border:1px solid black;
-	padding:10px;
-	margin:0 0 15px 285px;
-	width:400px;
+    background-color: #ffc;
+    border: 1px solid black;
+    padding: 5px;
+    margin: 4px;
 }
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    align-content: flex-start;
+    font-size: 10px;
+    background: white;
+}
+
+/* Sidebar */
+    #sidebar {
+        order: 1;
+        min-width: 320px;
+        max-width: 320px;
+        padding: 0 20px;
+        font-size: 10px;
+        background: white;
+        flex: 1;
+    }
+    #sidebar p {
+        text-align:center;
+    }
+    #sidebar .section {
+        background:#DAE3DA;
+        margin:0 0 2.5em 0;
+        padding-bottom:0.8em;
+        border:1px solid black;
+    }
+    #sidebar .section form {
+        padding:0.8em 0.8em 0 0.8em;
+    }
+    #sidebar h2 {
+        font-size:1.2em;
+        font-weight:bold;
+        padding:0.4em 0 0.4em 0.4em;
+        margin:0;
+        border-bottom:1px solid black;
+    }
+    #sidebar h3 {
+        font-weight:bold;
+        font-size:1.2em;
+        margin:1em 0 0.5em 0;
+    }
+    #sidebar ul {
+        margin:0.8em 0 0 1.5em;
+        padding:0;  
+    }
+    #sidebar #files_list, #sidebar #searchlist {
+        margin-left:1.5em;
+    }
+    #sidebar #uploadbutton {
+        margin:1em 0 0 0;
+    }
+    #sidebar .info {
+      float:right;
+    }
+    #files_list span.error {
+        cursor:pointer;
+    }
+    #uploadsection input {
+        width:200px;
+    }
+    #mkdir, #q {
+        width:140px;
+    }
+    #mkdirsubmit, #searchsubmit {
+        width:40px;
+    }
+    #q {
+        width:130px;
+    }
+    #searchsubmit {
+        width:50px;
+    }
+
+    .label_highlight {
+      font-weight:bold;
+    }
+    /* Search */
+    div#searchoptions {
+        margin:0.5em 0 0 0.3em;
+    }
+    dl#searchlist dt {
+        font-size:1.2em;;
+    }
+    dl#searchlist dt.dir {
+        font-weight:bold;
+    }
+    dl#searchlist dd {
+        margin:0.3em 0 0.5em 1em;
+        padding-left:0;
+    }
+    dl#searchlist dd a {
+        color:#666;
+    }
+    dl#searchlist dd a:hover {
+        color:#fff;
+    }
+
 /* File list */
-#filelist td.name a {
-	color:#000;
-  display:block;
-/*  width:100%;*/
-/*  height:100%;*/
-  padding:4px 2em 4px 10px;
-}
-#filelist td.name {
-  padding:0;
-  margin:0;
-}
-#filelist a:hover {
-	background:inherit;
-	text-decoration:none;
-}
-#filelist tr.rowhover a {
-	color:#fff;
-}
-#filelist {
-	border:1px solid black;
-	border-collapse:collapse;
-	margin:0 25px;
-}
-#filelist tfoot td, #filelist th {
-	border-top:1px solid black;
-	border-bottom:1px solid black;
-}
-#filelist th, #filelist tfoot td {
-	font-weight:bold;
-}
-#filelist th.size a {
-	color:white;
-}
-#filelist th {
-	padding:0.3em 0.6em;
-	text-align:left;
-}
-#filelist td.details {
-  padding:0.3em 0;
-}
-#filelist .details span.show, #filelist .details span.hide {
-	cursor:pointer;
-  padding:4px 4px;
-}
-#filelist th.size, 
-#filelist td.size, 
-#filelist th.date, 
-#filelist td.date {
-	text-align:right;
-}
-#filelist th.size, 
-#filelist td.size {
-  padding-right:10px;
-}
-#filelist tfoot td {
-	font-size:10px;
-	text-align:right;
-	font-weight:normal;
-}
-#filelist tr {
-	background:#fff;
-}
-#filelist tr.odd {
-	background:#DAE3DA;
-}
-#filelist tr.dir td.name {
-	font-weight:bold;
-}
-#filelist tr.highlight {
-	background:#ffc;
-	font-style:italic;
-	font-weight:bold;
-}
-#filelist tr.rowhover {
-	background:#326532;
-	color:#fff;
-}
-#filelist .hover, #filelist .filedetails ul li {
-	cursor:pointer;
-}
-#filelist .filedetails {
-	background:#ffc;
-	font-size:10px;
-	border-top:2px solid black;
-	border-bottom:2px solid black;
-	padding:1em 0.5em;
-}
-#filelist .filedetails td {
-	width:275px;
-}
-#filelist .filedetails .newvalue {
-	width:150px;
-}
-#filelist .filedetails form {
-	padding:0.3em;
-}
-#filelist .filedetails label {
-	display:block;
-	font-weight:bold;
-	margin:0 0 0.5em 0;
-}
-#filelist .filedetails ul {
-	list-style:none;
-	padding:0.3em 1.2em 0.3em 0.3em;
-	width:60px;
-	float:left;
-}
-#filelist .filedetails ul li.selected {
-	font-weight:bold;
-}
-#filelist td.error {
-	padding:1em 3em;
-}
-form#sort_form {
-  margin:0;
-  padding:0;
-  float:right;
-}
-#sort {
-  margin:0;
-  padding:0;
-}
+    #filelist {
+        order: 2;
+        border: 1px solid black;
+        margin: 0 20px 0 0;
+        flex: 1 auto;
+        display: block;
+    }
+        .imagesPreview {
+            overflow: scroll;
+            display: block;
+            max-height: 500px;
+        }
+        #imagesPreviewHeader,
+        #imagesPreviewFooter {
+            width: 100%;
+            height: 30px;
+            padding: 5px;
+            border-bottom: 1px solid #c3c3c3;
+            display: inline-block;
+        }
+        #filelist .file {
+            display: inline-block;
+            float: left;
+            border: 1px solid #c3c3c3;
+            margin: 2px;
+            padding: 2px;
+            width: 130px;
+            text-align: center;
+            }
+                #filelist .file:hover {
+                    border: 1px solid #03a9f4;
+                    background-color: #03a9f4;
+                    color: white;
+                }
+            #filelist .file .preview,
+            #filelist .file .name,
+            #filelist .file .size,
+            #filelist .file .date{
+                width: 100%;
+                float: none;
+                font-size: 8px;
+                height: 10px;
+                text-align: left;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            #filelist .file .preview {
+                text-align: center;
+                position: relative;
+                z-index: 0;
+                margin: 0 5px;
+                width: 116px;
+                height: 174px;
+                overflow: hidden;
+                cursor: pointer;
+            }
+            #filelist .file .preview img{
+                position: relative;
+                height: 100%;
+                left: 100%;
+                margin-left: -200%;
+            }
+    #filelist div.name {
+      padding:0;
+      margin:0;
+    }
+
+    form#sort_form {
+      margin:0;
+      padding:0;
+      float:right;
+    }
+    #sort {
+      margin:0;
+      padding:0;
+    }
+
 /* Edit form */
-form#edit, #main {
-/*  margin-left:265px;*/
-float:left;
-}
+
 form#edit textarea {
 	margin:1.5em 0 1em 0;
 }
@@ -350,12 +300,12 @@ form#edit textarea {
   float:right;
 }
 /* Footer */
-#footer {
-	font-size:10px;
-	clear:both;
-	margin:25px;
-	padding-bottom:50px;
-}
+    #footer {
+        height: 35px;
+        font-size: 10px;
+        background: white;
+        padding: 0 20px;
+    }
 .seperator {
 	border-top:2px solid #326532;
 }
@@ -367,3 +317,62 @@ form#edit textarea {
 	background:#ffc;
 	width:250px;
 }
+
+
+
+
+
+#bigPicPreview {
+    padding: 5px;
+    border: 1px solid #c3c3c3;
+    max-width: 50%;
+    max-height: 80%;
+    float: left;
+}
+#bigPicData {
+    width: 45%;
+    float: right;
+    }
+    #bigPicData label {
+        display: block;
+        width: 90%;
+        margin: 0 0 10px 0;
+    }
+.imagesPreview .dir {
+    background: transparent url("folder.png") center center no-repeat;
+    display: inline-block;
+    float: left;
+    border: 1px solid #c3c3c3;
+    margin: 2px;
+    padding: 176px 2px 2px 2px;
+    width: 130px;
+    height: 210px;
+    font-size: 8px;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+    float: right;
+    width: 100%;
+    }
+    .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button {
+    float: right;
+    }
+    .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button[disabled] {
+        opacity: 0.4;
+        filter: alpha(opacity=40); /* For IE8 and earlier */
+        cursor: default;
+    }
+    #newValueFilenameLabel {margin-bottom: 10px;}
+        /*#newValueFilenameLabel {margin-bottom: 10px;}*/
+
+    #renameDialogButton {
+        margin-right: 40px;
+    }
+    #deleteDialogButton {
+        float: left;
+        background: #ff0000;
+        color: white;
+    }
+    #selectDialogButton {
+        background: #149D14;
+        color: white;   
+    }
