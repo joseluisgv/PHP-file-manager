@@ -87,6 +87,61 @@ function ft_check_dir($dir) {
 }
 
 /**
+ * Check to see if running in a Windows system (to have the is_writable workarround, in axample)
+ *
+ * @return TRUE if running on a Windows system.
+ */
+function is_windows() {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Workaround for Windows bug in is_writable() function.
+ * PHP has issues with Windows ACL's for determine if a directory is writable or not,
+ * this works around them by checking the ability to open files rather than relying 
+ * upon PHP to interprate the OS ACL.
+ *
+ * @param $dir
+ *   Directory or file path to check.
+ * @return TRUE if path is writable.
+ */
+function win_is_writable( $path ) {
+
+    if ( $path[strlen( $path ) - 1] == '/' ) { // if it looks like a directory, check a random file within the directory
+        return win_is_writable( $path . uniqid( mt_rand() ) . '.tmp');
+    } elseif ( is_dir( $path ) ) { // If it's a directory (and not a file) check a random file within the directory
+        return win_is_writable( $path . '/' . uniqid( mt_rand() ) . '.tmp' );
+    }
+    // check tmp file for read/write capabilities
+    $should_delete_tmp_file = !file_exists( $path );
+    $f = @fopen( $path, 'a' );
+    if ( $f === false )
+        return false;
+    fclose( $f );
+    if ( $should_delete_tmp_file )
+        unlink( $path );
+    return true;
+}
+
+
+/**
+ * Check if a path is writable, avoiding fails for windows systems on is_writable
+ *
+ * @param $dir
+ *   Directory or file path to check.
+ * @return TRUE if path is writable.
+ */
+function can_write( $path ) {
+    if (!is_windows()) return is_writable($path);
+    return win_is_writable( $path );
+}
+
+
+
+/**
  * Check if file actions are allowed in the current directory.
  *
  * @return TRUE is file actions are allowed.
@@ -397,12 +452,12 @@ function ft_do_action() {
 			}
 			// Check for level.
 			if (substr_count($dir, "../") <= substr_count(ft_get_dir(), "/") && ft_check_move($dir) === TRUE) {
-				$dir  = ft_get_dir()."/".$dir;
-				if (!empty($file) && file_exists(ft_get_dir()."/".$file)) {
+				$dir  = ft_get_dir().DIRECTORY_SEPARATOR.$dir;
+				if (!empty($file) && file_exists(ft_get_dir().DIRECTORY_SEPARATOR.$file)) {
 					// Check that destination exists and is a directory.
 					if (is_dir($dir)) {
 						// Move file.
-						if (@rename(ft_get_dir()."/".$file, $dir."/".$file)) {
+						if (@rename(ft_get_dir().DIRECTORY_SEPARATOR.$file, $dir."/".$file)) {
 							// Success.
 							ft_set_message(t("!old was moved to !new", array('!old' => $file, '!new' => $dir)));
 							ft_redirect("dir={$_REQUEST['dir']}");
@@ -433,25 +488,25 @@ function ft_do_action() {
 			
             //$file = ft_stripslashes($_REQUEST['file']);
             $file = ft_stripslashes($_REQUEST['file']);
-
+            $file = urldecode($file);
             if (!empty($file) && ft_check_file($file)) {
 
-				if (is_dir(ft_get_dir()."/".$file)) {
+				if (is_dir(ft_get_dir().DIRECTORY_SEPARATOR.$file)) {
                     
                     if (DELETEFOLDERS == TRUE) {
-                        ft_rmdir_recurse(ft_get_dir()."/".$file);
+                        ft_rmdir_recurse(ft_get_dir().DIRECTORY_SEPARATOR.$file);
                     }
 
-					if (!@rmdir(ft_get_dir()."/".$file)) {
-                        ft_set_message(t("!old could not be deleted.", array('!old' => $file)), 'error');
+					if (!@rmdir(ft_get_dir().DIRECTORY_SEPARATOR.$file)) {
+                        ft_set_message(t("!old could not be deleted.", array('!old' => $file))." - Error type 1", 'error');
 						ft_redirect("dir={$_REQUEST['dir']}");
 					} else {
                         ft_set_message(t("!old deleted.", array('!old' => $file)));
 						ft_redirect("dir={$_REQUEST['dir']}");
 					}
 				} else {
-					if (!@unlink(ft_get_dir()."/".$file)) {
-                        ft_set_message(t("!old could not be deleted.", array('!old' => $file)), 'error');
+					if (!@unlink(ft_get_dir().DIRECTORY_SEPARATOR.$file)) {
+                        ft_set_message(t("!old could not be deleted.", array('!old' => $file))." - Error type 2", 'error');
 						ft_redirect("dir={$_REQUEST['dir']}");
 					} else {
                         ft_set_message(t("!old deleted.", array('!old' => $file)));
@@ -459,14 +514,14 @@ function ft_do_action() {
 					}
 				}
 			} else {
-                ft_set_message(t("!old could not be deleted.", array('!old' => $file)), 'error');
+                ft_set_message(t("!old could not be deleted.", array('!old' => $file))." - Error type 3", 'error');
 				ft_redirect("dir={$_REQUEST['dir']}");
 			}
 		# Rename && Duplicate && Symlink
 		} elseif ($_REQUEST['act'] == "rename" || $_REQUEST['act'] == "duplicate" || $_REQUEST['act'] == "symlink" && ft_check_fileactions() === TRUE) {
 			// Check that both file and newvalue are set.
-			$old = trim(ft_stripslashes($_REQUEST['file']));
-			$new = trim(ft_stripslashes($_REQUEST['newvalue']));
+			$old = urldecode( trim(ft_stripslashes($_REQUEST['file'])) );
+			$new = urldecode( trim(ft_stripslashes($_REQUEST['newvalue'])) );
 			if ($_REQUEST['act'] == 'rename') {
 			  $m['typefail'] = t("!old was not renamed to !new (type not allowed).", array('!old' => $old, '!new' => $new));
 			  $m['writefail'] = t("!old could not be renamed (write failed).", array('!old' => $old));
@@ -486,11 +541,12 @@ function ft_do_action() {
 			if (!empty($old) && !empty($new)) {
 				if (ft_check_filetype($new) && ft_check_file($new)) {
 					// Make sure destination file doesn't exist.
-					if (!file_exists(ft_get_dir()."/".$new)) {
+					if (!file_exists(ft_get_dir().DIRECTORY_SEPARATOR.$new)) {
 						// Check that file exists.
-						if (is_writeable(ft_get_dir()."/".$old)) {
+
+						if (can_write(ft_get_dir(). DIRECTORY_SEPARATOR .$old)) {
 							if ($_REQUEST['act'] == "rename") {
-								if (@rename(ft_get_dir()."/".$old, ft_get_dir()."/".$new)) {
+								if (@rename(ft_get_dir().DIRECTORY_SEPARATOR.$old, ft_get_dir().DIRECTORY_SEPARATOR.$new)) {
 									// Success.
 									ft_set_message(t("!old was renamed to !new", array('!old' => $old, '!new' => $new)));
 									ft_redirect("dir={$_REQUEST['dir']}");
@@ -501,7 +557,7 @@ function ft_do_action() {
 								}
 							} elseif ($_REQUEST['act'] == 'symlink') {
 							  if (ADVANCEDACTIONS == TRUE) {
-  								if (@symlink(realpath(ft_get_dir()."/".$old), ft_get_dir()."/".$new)) {
+  								if (@symlink(realpath(ft_get_dir().DIRECTORY_SEPARATOR.$old), ft_get_dir().DIRECTORY_SEPARATOR.$new)) {
   								  @chmod(ft_get_dir()."/{$new}", PERMISSION);
   									// Success.
   									ft_set_message(t("Created symlink !new", array('!old' => $old, '!new' => $new)));
@@ -513,7 +569,7 @@ function ft_do_action() {
   								}
 							  }
 							} else {
-								if (@copy(ft_get_dir()."/".$old, ft_get_dir()."/".$new)) {
+								if (@copy(ft_get_dir().DIRECTORY_SEPARATOR.$old, ft_get_dir().DIRECTORY_SEPARATOR.$new)) {
 									// Success.
 									ft_set_message(t("!old was duplicated to !new", array('!old' => $old, '!new' => $new)));
 									ft_redirect("dir={$_REQUEST['dir']}");
@@ -593,7 +649,7 @@ function ft_do_action() {
 								break;
 							case 2:
 						    $msglist++;
-							  ft_set_message(t('!file was not uploaded.', array('!file' => ft_get_nice_filename($c['name'], 20))) . ' ' . t("The file was larger than MAXSIZE setting."), 'error');
+							  ft_set_message(t('!file was not uploaded.', array('!file' => ft_get_nice_filename($c['name'], 20))) . ' ' . t("The file was larger than MAXSIZE setting.") . '('. intval((MAXSIZE/1024)/1024).') MB', 'error');
 								break;
 							case 3:
 						    $msglist++;
@@ -622,9 +678,9 @@ function ft_do_action() {
 			// Check that file is set.
 			$file = ft_stripslashes($_REQUEST['file']);
 			
-            if (!empty($file) && ft_check_file($file) && ft_check_filetype($file) && strtolower(ft_get_ext($file)) == 'zip' && is_file(ft_get_dir()."/".$file)) {
-                $escapeddir = escapeshellarg(ft_get_dir()."/");
-                $escapedfile = escapeshellarg(ft_get_dir()."/".$file);
+            if (!empty($file) && ft_check_file($file) && ft_check_filetype($file) && strtolower(ft_get_ext($file)) == 'zip' && is_file(ft_get_dir().DIRECTORY_SEPARATOR.$file)) {
+                $escapeddir = escapeshellarg(ft_get_dir().DIRECTORY_SEPARATOR);
+                $escapedfile = escapeshellarg(ft_get_dir().DIRECTORY_SEPARATOR.$file);
 				if (!@exec("unzip -n ".$escapedfile." -d ".$escapeddir)) {
                     ft_set_message(t("!old could not be unzipped.", array('!old' => $file)), 'error');
 					ft_redirect("dir={$_REQUEST['dir']}");
@@ -650,7 +706,7 @@ function ft_do_action() {
       			    $chmod = '0'.substr($chmod, 0, 3);
       			  }
       			  // Chmod
-      			  if (@chmod(ft_get_dir()."/".$file, intval($chmod, 8))) {
+      			  if (@chmod(ft_get_dir().DIRECTORY_SEPARATOR.$file, intval($chmod, 8))) {
       			    ft_set_message(t("Permissions changed for !old.", array('!old' => $file)));
       			    ft_redirect("dir={$_REQUEST['dir']}");
         			  clearstatcache();
@@ -811,7 +867,7 @@ function ft_get_filelist($dir, $sort = 'name') {
         $c['shortname'] = $file;
 				$c['type'] = "file";
 				$c['ext'] = ft_get_ext($file);
-				$c['writeable'] = is_writeable("{$dir}/{$file}");
+				$c['writeable'] = can_write("{$dir}/{$file}");
 
         // Grab extra options from plugins.
 				$c['extras'] = array();
@@ -1066,7 +1122,7 @@ function ft_make_body() {
     $str .= "<div id='filelist'>";
         // Make system messages.
         	$status = '';
-        	if (ft_check_upload() === TRUE && is_writeable(ft_get_dir()) && (LIMIT > 0 && LIMIT < ROOTDIRSIZE)) {
+        	if (ft_check_upload() === TRUE && can_write(ft_get_dir()) && (LIMIT > 0 && LIMIT < ROOTDIRSIZE)) {
         	   $status = '<p class="error">' . t('Upload disabled. Total disk space use of !size exceeds the limit of !limit.', array('!limit' => ft_get_nice_filesize(LIMIT), '!size' => ft_get_nice_filesize(ROOTDIRSIZE))) . '</p>';
         	}
         	$status .= ft_make_messages();
@@ -1408,7 +1464,7 @@ function ft_make_messages() {
 function ft_make_sidebar() {
 	$str = '<div id="sidebar">';
   // $status = '';
-  // if (ft_check_upload() === TRUE && is_writeable(ft_get_dir()) && (LIMIT > 0 && LIMIT < ROOTDIRSIZE)) {
+  // if (ft_check_upload() === TRUE && can_write(ft_get_dir()) && (LIMIT > 0 && LIMIT < ROOTDIRSIZE)) {
   //   $status = '<p class="alarm">' . t('Upload disabled. Total disk space use of !size exceeds the limit of !limit.', array('!limit' => ft_get_nice_filesize(LIMIT), '!size' => ft_get_nice_filesize(ROOTDIRSIZE))) . '</p>';
   // }
   // $status .= ft_make_messages();
@@ -1417,7 +1473,7 @@ function ft_make_sidebar() {
   // } else {
   //  $str .= "<div id='status' class='section'><h2>".t('Results')."</h2>{$status}</div>";
   // }
-	if (ft_check_upload() === TRUE && is_writeable(ft_get_dir())) {
+	if (ft_check_upload() === TRUE && can_write(ft_get_dir())) {
 	  if (LIMIT <= 0 || LIMIT > ROOTDIRSIZE) {
     	$str .= '
     	<div class="section" id="create">
